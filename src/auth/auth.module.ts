@@ -7,7 +7,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [PassportModule, JwtModule.register({ secret: config().secretJwt })],
+  imports: [
+    PassportModule,
+    JwtModule.register({
+      secret: config().secretJwt,
+      signOptions: { expiresIn: config().expiresIn },
+    }),
+  ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
 })
