@@ -1,4 +1,4 @@
 export default () => ({
-  secretJwt: process.env.JWT_KEY,
+  secretJwt: process.env.JWT_SECRET_KEY,
   expiresIn: process.env.EXPIRES_IN
 });
