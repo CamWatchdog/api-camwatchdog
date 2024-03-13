@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    networks:
+      - api
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=watchdog
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - /data/postgres:/data/postgres
+networks:
+  api:
+    driver: bridge
