@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { OccurrenceModule } from './occurrence/occurrence.module';
 
 @Module({
   imports: [
@@ -20,11 +21,13 @@ import { UsersModule } from './users/users.module';
       database: process.env.POSTGRES_DATABASE,
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
-      entities: ['dist/**/*/*.entity.js'],
+      entities: ['dist/**/*/*.entity.{js, ts}'],
+      autoLoadEntities: true,
       synchronize: true,
     }),
     AuthModule,
     UsersModule,
+    OccurrenceModule,
   ],
   controllers: [AppController],
   providers: [
