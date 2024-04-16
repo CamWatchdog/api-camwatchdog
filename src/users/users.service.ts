@@ -3,35 +3,71 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { ListUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const salt = await bcrypt.genSalt(10);
-    const cryptPass = await bcrypt.hash(createUserDto.password, salt);
-
-    createUserDto.password = cryptPass;
+    createUserDto.password = await this.genCryptedPassword(createUserDto.password);
 
     return await this.userRepository.save(createUserDto);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(query: ListUserDto) {
+    const [data, total] = await this.userRepository.findAndCount({
+      where: [
+        {
+          cpf: Like(`%${query.search || ''}%`),
+        },
+        {
+          email: Like(`%${query.search || ''}%`),
+        },
+        {
+          name: Like(`%${query.search || ''}%`),
+        },
+      ],
+      order: { name: 'ASC', cpf: 'ASC', email: 'ASC' },
+      take: query.pageSize,
+      skip: (query.page - 1) * query.pageSize,
+    });
+
+    const totalRegister = await this.userRepository.count();
+
+    return {
+      data,
+      total,
+      totalRegister,
+      totalPages: Math.ceil(total / query.pageSize),
+    };
   }
 
-  findOne(cpf: string) {
-    return `This action returns a #${cpf} user`;
+  async findOne(id: number) {
+    return await this.userRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password) {
+      updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
+    }
+    return await this.userRepository.update(id, updateUserDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    return await this.userRepository.update(id, { isActive: false });
+  }
+
+  async changeUserPassword(id: number, password: string) {
+    return await this.userRepository.update(id, {
+      password: await this.genCryptedPassword(password),
+    });
+  }
+
+  private async genCryptedPassword(password: string) {
+    const salt = await bcrypt.genSalt(10);
+    return await bcrypt.hash(password, salt);
   }
 }

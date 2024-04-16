@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Occurrence } from './entities/occurrence.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { createFile } from 'src/common/storage.helper';
-import { ListAllOccurence } from './dto/list-occurence.dto';
+import { ListAllOccurence } from './dto';
 
 @Injectable()
 export class OccurrenceService {
@@ -60,6 +60,4 @@ export class OccurrenceService {
   findOne(id: number) {
     return this.occurrenceRepository.findOneBy({ id });
   }
-
-  getTotalByUsername() {}
 }

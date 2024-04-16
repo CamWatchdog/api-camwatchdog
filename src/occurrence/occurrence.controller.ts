@@ -3,7 +3,7 @@ import { OccurrenceService } from './occurrence.service';
 import { CreateOccurrenceDto, CreateOccurrenceFiles } from './dto/create-occurrence.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/jwt.strategy';
-import { ListAllOccurence } from './dto/list-occurence.dto';
+import { ListAllOccurence } from './dto';
 
 @Controller('api')
 export class OccurrenceController {

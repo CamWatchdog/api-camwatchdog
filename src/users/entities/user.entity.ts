@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import Enum from '../../enum';
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -32,4 +34,10 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true, onUpdate: 'NOW()' })
   updatedAt: string;
+
+  @Column({ type: 'varbit', nullable: false, default: '1' })
+  isActive: boolean;
+
+  @Column({ type: 'int', nullable: false, default: Enum.Role.Common })
+  role: number;
 }
