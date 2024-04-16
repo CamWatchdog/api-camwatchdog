@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { OccurrenceModule } from './occurrence/occurrence.module';
+import { ComputerModule } from './computer/computer.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { OccurrenceModule } from './occurrence/occurrence.module';
     AuthModule,
     UsersModule,
     OccurrenceModule,
+    ComputerModule,
   ],
   controllers: [AppController],
   providers: [
