@@ -13,7 +13,9 @@ export class ComputerService {
   ) {}
 
   create(createComputerDto: CreateComputerDto) {
-    this.computerRepository.save(createComputerDto);
+    const computer = { ...createComputerDto, token: this.genComputerToken() };
+
+    this.computerRepository.save(computer);
   }
 
   async findAll(query: ListComputerDto) {
@@ -41,10 +43,21 @@ export class ComputerService {
   }
 
   update(id: number, updateComputerDto: UpdateComputerDto) {
-    return this.computerRepository.update(id, updateComputerDto);
+    const computer = { ...updateComputerDto, token: this.genComputerToken() };
+    return this.computerRepository.update(id, computer);
   }
 
   remove(id: number) {
     this.computerRepository.update(id, { isActive: false });
+  }
+
+  private genComputerToken() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < 10; i++) {
+      token += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    token += `-${new Date().getTime()}`;
+    return btoa(token);
   }
 }

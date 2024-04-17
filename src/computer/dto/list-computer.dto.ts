@@ -1,3 +1,5 @@
+import { IsNumber, IsOptional, IsString, Max, Min, ValidateIf } from 'class-validator';
+
 export class ListComputerDto {
   @ValidateIf((ps) => ps >= 0)
   @Max(100)
