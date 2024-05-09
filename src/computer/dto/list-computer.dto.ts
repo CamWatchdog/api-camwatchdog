@@ -13,6 +13,7 @@ export class ListComputerDto {
   @ValidateIf((ps) => ps >= 0)
   @IsOptional()
   @IsNumber()
+  @IsOptional()
   startTime: string;
 
   @ValidateIf((ps) => ps >= 0)

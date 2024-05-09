@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { OccurrenceModule } from './occurrence/occurrence.module';
 import { ComputerModule } from './computer/computer.module';
+import { jwtConfig } from './auth/jwt.config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { ComputerModule } from './computer/computer.module';
     UsersModule,
     OccurrenceModule,
     ComputerModule,
+    JwtModule.registerAsync(jwtConfig),
   ],
   controllers: [AppController],
   providers: [

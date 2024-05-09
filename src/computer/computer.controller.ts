@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ComputerService } from './computer.service';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
+import { ListComputerDto } from './dto';
 
 @Controller('computer')
 export class ComputerController {
@@ -13,8 +14,8 @@ export class ComputerController {
   }
 
   @Get()
-  findAll() {
-    return this.computerService.findAll();
+  findAll(@Query() query: ListComputerDto) {
+    return this.computerService.findAll(query);
   }
 
   @Get(':id')
