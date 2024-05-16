@@ -2,16 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import Enum from '../../enum';
+import { UUID } from 'crypto';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'uuid', nullable: false })
+  @Generated('uuid')
+  userId: UUID;
 
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;

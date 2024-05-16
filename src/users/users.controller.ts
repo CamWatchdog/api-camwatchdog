@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ListUserDto } from './dto';
 import { Public } from 'src/auth/jwt.strategy';
+import { UUID } from 'crypto';
 
 @Controller('users')
 export class UsersController {
@@ -21,23 +22,26 @@ export class UsersController {
     return this.userService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.userService.findOne(id);
+  @Get(':userId')
+  findOne(@Param('userId') userId: UUID) {
+    return this.userService.findOne(userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  @Patch(':userId')
+  update(@Param('userId') userId: UUID, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(userId, updateUserDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.userService.remove(id);
+  @Delete(':userId')
+  remove(@Param('userId') userId: UUID) {
+    return this.userService.remove(userId);
   }
 
-  @Patch('/changeUserPassword/:id')
-  changeUserPassword(@Param('id') id: number, @Body() changeUserPassword: { password: string }) {
-    return this.userService.changeUserPassword(id, changeUserPassword.password);
+  @Patch('/changeUserPassword/:userId')
+  changeUserPassword(
+    @Param('userId') userId: UUID,
+    @Body() changeUserPassword: { currentPassword: string; newPassword: string },
+  ) {
+    return this.userService.changeUserPassword(userId, changeUserPassword);
   }
 }

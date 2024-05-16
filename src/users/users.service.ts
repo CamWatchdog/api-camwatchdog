@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ListUserDto } from './dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class UsersService {
@@ -45,29 +46,50 @@ export class UsersService {
     };
   }
 
-  async findOne(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+  async findOne(userId: UUID) {
+    return await this.userRepository.findOne({ where: { userId } });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(userId: UUID, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
     }
-    return await this.userRepository.update(id, updateUserDto);
+    return await this.userRepository.update(userId, updateUserDto);
   }
 
-  async remove(id: number) {
-    return await this.userRepository.update(id, { isActive: false });
+  async remove(userId: UUID) {
+    return await this.userRepository.update(userId, { isActive: false });
   }
 
-  async changeUserPassword(id: number, password: string) {
-    return await this.userRepository.update(id, {
-      password: await this.genCryptedPassword(password),
-    });
+  async changeUserPassword(
+    userId: UUID,
+    changeUserPasswordDto: { currentPassword: string; newPassword: string },
+  ) {
+    const user = await this.findOne(userId);
+    const isSamePasswor = await this.comparePassword(
+      changeUserPasswordDto.currentPassword,
+      user.password,
+    );
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    } else if (user && !isSamePasswor) {
+      throw new BadRequestException('Current password is incorrect!');
+    }
+    return await this.userRepository.update(
+      { userId },
+      {
+        password: await this.genCryptedPassword(changeUserPasswordDto.newPassword),
+      },
+    );
   }
 
   private async genCryptedPassword(password: string) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
+  }
+
+  private async comparePassword(password: string, hash: string) {
+    return await bcrypt.compare(password, hash);
   }
 }
