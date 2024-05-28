@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { ListComputerDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class ComputerService {
@@ -15,12 +16,15 @@ export class ComputerService {
   ) {}
 
   create(createComputerDto: CreateComputerDto) {
+    const token = this.jwtService.sign({ description: createComputerDto.description });
     const computer = {
       ...createComputerDto,
-      token: this.jwtService.sign({ description: createComputerDto.description }),
+      token,
     };
 
     this.computerRepository.save(computer);
+
+    return token;
   }
 
   async findAll(
@@ -29,6 +33,7 @@ export class ComputerService {
     const [data, total] = await this.computerRepository.findAndCount({
       where: {
         description: Like(`%${query.description || ''}%`),
+        isActive: 1,
       },
       order: { description: 'ASC', createdAt: 'DESC' },
       take: query.pageSize,
@@ -45,19 +50,20 @@ export class ComputerService {
     };
   }
 
-  findOne(id: number) {
-    return this.computerRepository.findOne({ where: { id } });
+  findOne(id: UUID) {
+    return this.computerRepository.findOne({ where: { computerId: id, isActive: 1 } });
   }
 
-  update(id: number, updateComputerDto: UpdateComputerDto) {
+  async update(id: UUID, updateComputerDto: UpdateComputerDto) {
     const computer = {
       ...updateComputerDto,
       token: this.jwtService.sign({ description: updateComputerDto.description }),
     };
-    return this.computerRepository.update(id, computer);
+    await this.computerRepository.update({ computerId: id }, computer);
+    return (await this.findOne(id)).token;
   }
 
-  remove(id: number) {
-    this.computerRepository.update(id, { isActive: false });
+  async remove(id: UUID) {
+    await this.computerRepository.update({ computerId: id }, { isActive: 0 });
   }
 }

@@ -1,9 +1,10 @@
+import { UUID } from 'crypto';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Computer {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  computerId: UUID;
 
   @Column({ type: 'varchar', nullable: false })
   token: string;
@@ -12,7 +13,7 @@ export class Computer {
   description: string;
 
   @Column({ type: 'bit', nullable: false, default: 1 })
-  isActive: boolean;
+  isActive: 0 | 1;
 
   @CreateDateColumn({ type: 'timestamp', nullable: false })
   createdAt: string;

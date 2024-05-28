@@ -3,6 +3,7 @@ import { ComputerService } from './computer.service';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
 import { ListComputerDto } from './dto';
+import { UUID } from 'crypto';
 
 @Controller('computer')
 export class ComputerController {
@@ -19,17 +20,17 @@ export class ComputerController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: UUID) {
     return this.computerService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateComputerDto: UpdateComputerDto) {
+  update(@Param('id') id: UUID, @Body() updateComputerDto: UpdateComputerDto) {
     return this.computerService.update(id, updateComputerDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: UUID) {
     return this.computerService.remove(id);
   }
 }
