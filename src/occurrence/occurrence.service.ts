@@ -49,7 +49,7 @@ export class OccurrenceService {
       data,
       total,
       totalRegister,
-      totalPages: Math.ceil(total / query.pageSize),
+      totalPages: Math.ceil(totalRegister / query.pageSize),
     };
   }
 
