@@ -14,12 +14,12 @@ export class ListComputerDto {
   @IsOptional()
   @IsNumber()
   @IsOptional()
-  startTime: string;
+  startTime: number;
 
   @ValidateIf((ps) => ps >= 0)
   @IsOptional()
   @IsNumber()
-  endTime: string;
+  endTime: number;
 
   @IsString()
   description: string;
