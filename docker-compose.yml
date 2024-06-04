@@ -5,16 +5,11 @@ services:
     container_name: postgres
     image: postgres:latest
     ports:
-      - 5432:5432
-    networks:
-      - api
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=watchdog
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DATABASE}
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - /data/postgres:/data/postgres
-networks:
-  api:
-    driver: bridge
