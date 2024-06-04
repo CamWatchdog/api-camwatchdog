@@ -31,11 +31,11 @@ export class ComputerService {
   async findAll(
     query: ListComputerDto = { description: '', page: 1, pageSize: 10, startTime: 0, endTime: 0 },
   ) {
-    const startTime = format(new Date(+query.startTime).toUTCString(), 'yyyy-MM-dd HH:mm:SS');
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 1);
+    const startTime = format(new Date(+query.startTime).toISOString(), 'yyyy-MM-dd HH:mm:SS');
     const endTime = format(
-      query.endTime && +query.endTime > 0
-        ? new Date(+query.endTime).toUTCString()
-        : new Date().toUTCString(),
+      query.endTime && +query.endTime > 0 ? new Date(+query.endTime) : currentDate,
       'yyyy-MM-dd HH:mm:SS',
     );
 
@@ -50,7 +50,13 @@ export class ComputerService {
       skip: (query.page - 1) * query.pageSize,
     });
 
-    const totalRegister = await this.computerRepository.count({ where: { isActive: 1 } });
+    const totalRegister = await this.computerRepository.count({
+      where: {
+        description: Like(`%${query.description || ''}%`),
+        isActive: 1,
+        createdAt: Between(startTime, endTime),
+      },
+    });
 
     return {
       data,

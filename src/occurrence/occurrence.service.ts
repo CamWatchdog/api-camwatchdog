@@ -30,8 +30,13 @@ export class OccurrenceService {
   }
 
   async findAll(query: ListAllOccurence) {
-    const startTime = format(new Date(+query.startTime).toUTCString(), 'yyyy-MM-dd HH:mm:SS');
-    const endTime = format(new Date(+query.endTime).toUTCString(), 'yyyy-MM-dd HH:mm:SS');
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 1);
+    const startTime = format(new Date(+query.startTime).toISOString(), 'yyyy-MM-dd HH:mm:SS');
+    const endTime = format(
+      query.endTime && +query.endTime > 0 ? new Date(+query.endTime) : currentDate,
+      'yyyy-MM-dd HH:mm:SS',
+    );
 
     const [data, total] = await this.occurrenceRepository.findAndCount({
       where: {
@@ -43,7 +48,12 @@ export class OccurrenceService {
       skip: (query.page - 1) * query.pageSize,
     });
 
-    const totalRegister = await this.occurrenceRepository.count();
+    const totalRegister = await this.occurrenceRepository.count({
+      where: {
+        user: Like(`%${query.username || ''}%`),
+        createdAt: Between(startTime, endTime),
+      },
+    });
 
     return {
       data,
