@@ -5,6 +5,7 @@ import { Occurrence } from './entities/occurrence.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { createFile } from 'src/common/storage.helper';
 import { ListAllOccurence } from './dto';
+import { format } from 'date-fns';
 
 @Injectable()
 export class OccurrenceService {
@@ -29,18 +30,13 @@ export class OccurrenceService {
   }
 
   async findAll(query: ListAllOccurence) {
-    const startTime = query.startTime
-      ? new Date(+query.startTime).toUTCString()
-      : new Date().toUTCString();
-
-    const endTime = query.endTime
-      ? new Date(+query.endTime).toUTCString()
-      : new Date(0).toUTCString();
+    const startTime = format(new Date(+query.startTime).toUTCString(), 'yyyy-MM-dd HH:mm:SS');
+    const endTime = format(new Date(+query.endTime).toUTCString(), 'yyyy-MM-dd HH:mm:SS');
 
     const [data, total] = await this.occurrenceRepository.findAndCount({
       where: {
         user: Like(`%${query.username || ''}%`),
-        createdAt: Between(endTime, startTime),
+        createdAt: Between(startTime, endTime),
       },
       order: { user: 'ASC', createdAt: 'DESC' },
       take: query.pageSize,
@@ -53,7 +49,7 @@ export class OccurrenceService {
       data,
       total,
       totalRegister,
-      totalPages: Math.ceil(total / query.pageSize),
+      totalPages: Math.ceil(totalRegister / query.pageSize),
     };
   }
 
