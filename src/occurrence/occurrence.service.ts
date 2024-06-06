@@ -31,12 +31,14 @@ export class OccurrenceService {
 
   async findAll(query: ListAllOccurence) {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 1);
-    const startTime = format(new Date(+query.startTime).toISOString(), 'yyyy-MM-dd HH:mm:SS');
-    const endTime = format(
-      query.endTime && +query.endTime > 0 ? new Date(+query.endTime) : currentDate,
-      'yyyy-MM-dd HH:mm:SS',
-    );
+    const startTime =
+      query.startTime && +query.startTime > 0
+        ? new Date(query.startTime).toISOString()
+        : new Date(0).toISOString();
+    const endTime =
+      query.endTime && +query.endTime > 0
+        ? new Date(query.endTime).toISOString()
+        : currentDate.toISOString();
 
     const [data, total] = await this.occurrenceRepository.findAndCount({
       where: {

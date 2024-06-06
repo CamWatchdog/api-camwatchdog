@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
 import { Computer } from './entities/computer.entity';
@@ -7,7 +7,7 @@ import { Between, Like, Repository } from 'typeorm';
 import { ListComputerDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { UUID } from 'crypto';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 @Injectable()
 export class ComputerService {
@@ -32,12 +32,14 @@ export class ComputerService {
     query: ListComputerDto = { description: '', page: 1, pageSize: 10, startTime: 0, endTime: 0 },
   ) {
     const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 1);
-    const startTime = format(new Date(+query.startTime).toISOString(), 'yyyy-MM-dd HH:mm:SS');
-    const endTime = format(
-      query.endTime && +query.endTime > 0 ? new Date(+query.endTime) : currentDate,
-      'yyyy-MM-dd HH:mm:SS',
-    );
+    const startTime =
+      query.startTime && +query.startTime > 0
+        ? new Date(query.startTime).toISOString()
+        : new Date(0).toISOString();
+    const endTime =
+      query.endTime && +query.endTime > 0
+        ? new Date(query.endTime).toISOString()
+        : currentDate.toISOString();
 
     const [data, total] = await this.computerRepository.findAndCount({
       where: {
