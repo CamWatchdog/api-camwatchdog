@@ -13,12 +13,12 @@ export class ListAllOccurence {
   @ValidateIf((ps) => ps >= 0)
   @IsOptional()
   @IsNumber()
-  startTime: string;
+  startTime: number;
 
   @ValidateIf((ps) => ps >= 0)
   @IsOptional()
   @IsNumber()
-  endTime: string;
+  endTime: number;
 
   @IsString()
   username: string;

@@ -31,15 +31,14 @@ export class ComputerService {
   async findAll(
     query: ListComputerDto = { description: '', page: 1, pageSize: 10, startTime: 0, endTime: 0 },
   ) {
-    const currentDate = new Date();
     const startTime =
       query.startTime && +query.startTime > 0
-        ? new Date(query.startTime).toISOString()
+        ? new Date(+query.startTime).toISOString()
         : new Date(0).toISOString();
     const endTime =
       query.endTime && +query.endTime > 0
-        ? new Date(query.endTime).toISOString()
-        : currentDate.toISOString();
+        ? new Date(+query.endTime).toISOString()
+        : new Date().toISOString();
 
     const [data, total] = await this.computerRepository.findAndCount({
       where: {

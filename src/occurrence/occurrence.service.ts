@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateOccurrenceDto, CreateOccurrenceFiles } from './dto/create-occurrence.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Occurrence } from './entities/occurrence.entity';
@@ -30,15 +30,18 @@ export class OccurrenceService {
   }
 
   async findAll(query: ListAllOccurence) {
-    const currentDate = new Date();
+    Logger.debug(JSON.stringify(query));
+    Logger.debug('startTime', +query.startTime);
+    Logger.debug('endTime', +query.endTime);
+
     const startTime =
       query.startTime && +query.startTime > 0
-        ? new Date(query.startTime).toISOString()
+        ? new Date(+query.startTime).toISOString()
         : new Date(0).toISOString();
     const endTime =
       query.endTime && +query.endTime > 0
-        ? new Date(query.endTime).toISOString()
-        : currentDate.toISOString();
+        ? new Date(+query.endTime).toISOString()
+        : new Date().toISOString();
 
     const [data, total] = await this.occurrenceRepository.findAndCount({
       where: {
