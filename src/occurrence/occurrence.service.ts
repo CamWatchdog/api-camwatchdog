@@ -1,11 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateOccurrenceDto, CreateOccurrenceFiles } from './dto/create-occurrence.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Occurrence } from './entities/occurrence.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { createFile, getFile } from 'src/common/storage.helper';
 import { ListAllOccurence } from './dto';
-import { format } from 'date-fns';
 
 @Injectable()
 export class OccurrenceService {
@@ -30,10 +29,6 @@ export class OccurrenceService {
   }
 
   async findAll(query: ListAllOccurence) {
-    Logger.debug(JSON.stringify(query));
-    Logger.debug('startTime', +query.startTime);
-    Logger.debug('endTime', +query.endTime);
-
     const startTime =
       query.startTime && +query.startTime > 0
         ? new Date(+query.startTime).toISOString()

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateComputerDto } from './dto/create-computer.dto';
 import { UpdateComputerDto } from './dto/update-computer.dto';
 import { Computer } from './entities/computer.entity';
@@ -7,7 +7,6 @@ import { Between, Like, Repository } from 'typeorm';
 import { ListComputerDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { UUID } from 'crypto';
-// import { format } from 'date-fns';
 
 @Injectable()
 export class ComputerService {
