@@ -3,7 +3,7 @@ import { CreateOccurrenceDto, CreateOccurrenceFiles } from './dto/create-occurre
 import { InjectRepository } from '@nestjs/typeorm';
 import { Occurrence } from './entities/occurrence.entity';
 import { Between, Like, Repository } from 'typeorm';
-import { createFile } from 'src/common/storage.helper';
+import { createFile, getFile } from 'src/common/storage.helper';
 import { ListAllOccurence } from './dto';
 import { format } from 'date-fns';
 
@@ -60,8 +60,16 @@ export class OccurrenceService {
       },
     });
 
+    const mappedOccurence = data.map((occurrence) => {
+      const newOcurrence = { ...occurrence, frameFileBase64: '', printFileBase64: '' };
+      newOcurrence.frameFileBase64 = getFile(newOcurrence.frameFilePath).toString('base64');
+      newOcurrence.printFileBase64 = getFile(newOcurrence.printFilePath).toString('base64');
+
+      return newOcurrence;
+    });
+
     return {
-      data,
+      data: mappedOccurence,
       total,
       totalRegister,
       totalPages: Math.ceil(totalRegister / query.pageSize),

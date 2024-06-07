@@ -9,3 +9,7 @@ export const createFile = (path: string, buffer: any) => {
     }
   });
 };
+
+export const getFile = (path: string) => {
+  return fs.readFileSync(path);
+};
