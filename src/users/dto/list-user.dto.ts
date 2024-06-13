@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsString, Max, Min, ValidateIf } from 'class-validator';
+import { IsString, Max, Min, ValidateIf } from 'class-validator';
 
 export class ListUserDto {
   @IsString()
-  @IsNotEmpty()
   search: string;
 
   @ValidateIf((ps) => ps >= 0)

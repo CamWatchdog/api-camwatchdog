@@ -38,8 +38,19 @@ export class UsersService {
 
     const totalRegister = await this.userRepository.count();
 
+    const mappedData = data.map((user) => ({
+      id: user.id,
+      userId: user.userId,
+      name: user.name,
+      cpf: user.cpf,
+      email: user.email,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      role: user.role,
+    }));
+
     return {
-      data,
+      data: mappedData,
       total,
       totalRegister,
       totalPages: Math.ceil(total / query.pageSize),
@@ -54,7 +65,7 @@ export class UsersService {
     if (updateUserDto.password) {
       updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
     }
-    return await this.userRepository.update(userId, updateUserDto);
+    return await this.userRepository.update({ userId }, updateUserDto);
   }
 
   async remove(userId: UUID) {
