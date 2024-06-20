@@ -69,7 +69,7 @@ export class UsersService {
   }
 
   async remove(userId: UUID) {
-    return await this.userRepository.update(userId, { isActive: false });
+    return await this.userRepository.update(userId, { isActive: 2 });
   }
 
   async changeUserPassword(
