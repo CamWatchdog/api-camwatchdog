@@ -16,7 +16,10 @@ export class ComputerService {
   ) {}
 
   create(createComputerDto: CreateComputerDto) {
-    const token = this.jwtService.sign({ description: createComputerDto.description });
+    const token = this.jwtService.sign(
+      { description: createComputerDto.description },
+      { expiresIn: '0' },
+    );
     const computer = {
       ...createComputerDto,
       token,
@@ -68,6 +71,10 @@ export class ComputerService {
 
   findOne(id: UUID) {
     return this.computerRepository.findOne({ where: { computerId: id, isActive: 1 } });
+  }
+
+  findDeleted(id: UUID) {
+    return this.computerRepository.findOne({ where: { computerId: id, isActive: 0 } });
   }
 
   async update(id: UUID, updateComputerDto: UpdateComputerDto) {

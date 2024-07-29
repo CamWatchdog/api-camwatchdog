@@ -2,7 +2,7 @@ import { Controller, Post, Body, UseInterceptors, UploadedFiles, Get, Query } fr
 import { OccurrenceService } from './occurrence.service';
 import { CreateOccurrenceDto, CreateOccurrenceFiles } from './dto/create-occurrence.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { Public } from 'src/auth/jwt.strategy';
+import { ComputerKey } from '../auth/jwt.strategy';
 import { ListAllOccurence } from './dto';
 
 @Controller('api')
@@ -10,7 +10,7 @@ export class OccurrenceController {
   constructor(private readonly apiService: OccurrenceService) {}
 
   @Post()
-  @Public()
+  @ComputerKey()
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'frame', maxCount: 1 },
@@ -22,7 +22,6 @@ export class OccurrenceController {
   }
 
   @Get('findAll')
-  @Public()
   findAll(@Query() query: ListAllOccurence) {
     return this.apiService.findAll(query);
   }

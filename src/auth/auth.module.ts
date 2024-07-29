@@ -10,6 +10,7 @@ import { jwtConfig } from './jwt.config';
 import { UsersModule } from 'src/users/users.module';
 import { Computer } from 'src/computer/entities/computer.entity';
 import { ComputerModule } from 'src/computer/computer.module';
+import { ComputerService } from 'src/computer/computer.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { ComputerModule } from 'src/computer/computer.module';
     UsersModule,
     ComputerModule,
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
-  exports: [AuthService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, ComputerService],
+  exports: [AuthService, ComputerService],
 })
 export class AuthModule {}
