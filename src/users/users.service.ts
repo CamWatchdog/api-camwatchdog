@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -63,7 +63,12 @@ export class UsersService {
 
   async update(userId: UUID, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
+      if (this.comparePassword(updateUserDto.password, updateUserDto.currentPassword)) {
+        updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
+      } else {
+        throw new BadRequestException('Current password is incorrect!')
+      }
+      delete updateUserDto.currentPassword
     }
     return await this.userRepository.update({ userId }, updateUserDto);
   }
