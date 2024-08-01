@@ -29,12 +29,15 @@ export class UsersService {
       where: [
         {
           cpf: Like(`%${query.search || ''}%`),
+          isActive: 1,
         },
         {
           email: Like(`%${query.search || ''}%`),
+          isActive: 1,
         },
         {
           name: Like(`%${query.search || ''}%`),
+          isActive: 1,
         },
       ],
       order: { name: 'ASC', cpf: 'ASC', email: 'ASC' },
@@ -80,7 +83,7 @@ export class UsersService {
   }
 
   async remove(userId: UUID) {
-    return await this.userRepository.update(userId, { isActive: 2 });
+    return await this.userRepository.update({ userId: userId }, { isActive: 2 });
   }
 
   private async genCryptedPassword(password: string) {
