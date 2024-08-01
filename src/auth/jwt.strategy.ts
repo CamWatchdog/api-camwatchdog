@@ -6,6 +6,9 @@ import config from './getter.config';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
+export const IS_COMPUTER = 'isComputer';
+export const ComputerKey = () => SetMetadata(IS_COMPUTER, true);
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {

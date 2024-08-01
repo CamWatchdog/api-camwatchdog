@@ -1,27 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Computer } from 'src/computer/entities/computer.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Computer) private readonly computerRepository: Repository<Computer>,
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
+  async validateUser(username: string, password: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ email: username, isActive: 1 });
 
     if (user && bcrypt.compareSync(password, user.password)) {
       return user;
     }
   }
 
-  async login(user: any): Promise<{ access_token: string }> {
-    const payload = { name: user.name, id: user.id, cpf: user.cpf, email: user.email };
+  async validateComputer(description: string) {
+    const computer = await this.computerRepository.findOneBy({ description });
+
+    return computer;
+  }
+
+  async login(user: any): Promise<{ access_token: string; user: any }> {
+    const payload = {
+      name: user.name,
+      id: user.id,
+      userId: user.userId,
+      cpf: user.cpf,
+      email: user.email,
+    };
     return {
       access_token: await this.jwtService.signAsync(payload),
+      user: payload,
     };
   }
 }

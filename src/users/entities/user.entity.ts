@@ -2,14 +2,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import Enum from '../../enum';
+import { UUID } from 'crypto';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'uuid', nullable: false })
+  @Generated('uuid')
+  userId: UUID;
 
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;
@@ -32,4 +40,13 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true, onUpdate: 'NOW()' })
   updatedAt: string;
+
+  @Column({ type: 'int', nullable: false, default: 1 })
+  isActive: number;
+
+  @Column({ type: 'int', nullable: false, default: Enum.Role.Common })
+  role: number;
+
+  @Column({ type: 'int8', nullable: true })
+  token: number;
 }
