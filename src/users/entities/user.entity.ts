@@ -46,4 +46,7 @@ export class User {
 
   @Column({ type: 'int', nullable: false, default: Enum.Role.Common })
   role: number;
+
+  @Column({ type: 'int8', nullable: true })
+  token: number;
 }

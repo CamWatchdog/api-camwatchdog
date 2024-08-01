@@ -11,11 +11,24 @@ import { OccurrenceModule } from './occurrence/occurrence.module';
 import { ComputerModule } from './computer/computer.module';
 import { jwtConfig } from './auth/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      envFilePath: '.env',
       isGlobal: true,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

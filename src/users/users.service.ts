@@ -7,10 +7,16 @@ import { Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ListUserDto } from './dto';
 import { UUID } from 'crypto';
+import { GenerateResetCodeDto } from './dto/generate-reset-code.dto';
+import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly mailerService: MailerService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.password = await this.genCryptedPassword(createUserDto.password);
@@ -66,38 +72,15 @@ export class UsersService {
       if (this.comparePassword(updateUserDto.password, updateUserDto.currentPassword)) {
         updateUserDto.password = await this.genCryptedPassword(updateUserDto.password);
       } else {
-        throw new BadRequestException('Current password is incorrect!')
+        throw new BadRequestException('Current password is incorrect!');
       }
-      delete updateUserDto.currentPassword
+      delete updateUserDto.currentPassword;
     }
     return await this.userRepository.update({ userId }, updateUserDto);
   }
 
   async remove(userId: UUID) {
     return await this.userRepository.update(userId, { isActive: 2 });
-  }
-
-  async changeUserPassword(
-    userId: UUID,
-    changeUserPasswordDto: { currentPassword: string; newPassword: string },
-  ) {
-    const user = await this.findOne(userId);
-    const isSamePasswor = await this.comparePassword(
-      changeUserPasswordDto.currentPassword,
-      user.password,
-    );
-
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    } else if (user && !isSamePasswor) {
-      throw new BadRequestException('Current password is incorrect!');
-    }
-    return await this.userRepository.update(
-      { userId },
-      {
-        password: await this.genCryptedPassword(changeUserPasswordDto.newPassword),
-      },
-    );
   }
 
   private async genCryptedPassword(password: string) {
@@ -107,5 +90,55 @@ export class UsersService {
 
   private async comparePassword(password: string, hash: string) {
     return await bcrypt.compare(password, hash);
+  }
+
+  async generateAndSendNewResetCode(generateResetCodeDto: GenerateResetCodeDto) {
+    const token = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+
+    const user = await this.userRepository.findOne({
+      where: { email: generateResetCodeDto.email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found!');
+    }
+
+    const userUpdated = await this.userRepository.update({ email: user.email }, { token: token });
+
+    if (userUpdated.affected > 0) {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: 'CamWatchDog Confirmation Code',
+        html: `<h1>Token: ${token}</h1>`,
+      };
+
+      await this.mailerService.sendMail(mailOptions);
+    } else {
+      throw new HttpException('Error in update user!', 500);
+    }
+  }
+
+  async verifyResetPasswordCode(verifyResetPasswordCode: VerifyResetCodeDto) {
+    const user = await this.userRepository.findOne({
+      where: { email: verifyResetPasswordCode.email },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found!');
+    }
+    
+    if (user.token.toString() !== verifyResetPasswordCode.resetCode) {
+      throw new BadRequestException('Reset code incorrect!');
+    }
+
+    if (verifyResetPasswordCode.password !== verifyResetPasswordCode.confirmPassword) {
+      throw new BadRequestException('Passwords dont match!');
+    }
+
+    await this.userRepository.update(
+      { email: user.email },
+      { password: await this.genCryptedPassword(verifyResetPasswordCode.password) },
+    );
   }
 }

@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ListUserDto } from './dto';
 import { Public } from 'src/auth/jwt.strategy';
 import { UUID } from 'crypto';
+import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
+import { GenerateResetCodeDto } from './dto/generate-reset-code.dto';
 
 @Controller('users')
 export class UsersController {
@@ -36,12 +38,18 @@ export class UsersController {
   remove(@Param('userId') userId: UUID) {
     return this.userService.remove(userId);
   }
+  
+  @Public()
+  @Post('/sendResetCode')
+  @HttpCode(204)
+  generateAndSendNewResetCode(@Body() generateResetCodeDto: GenerateResetCodeDto) {
+    return this.userService.generateAndSendNewResetCode(generateResetCodeDto);
+  }
 
-  @Patch('/changeUserPassword/:userId')
-  changeUserPassword(
-    @Param('userId') userId: UUID,
-    @Body() changeUserPassword: { currentPassword: string; newPassword: string },
-  ) {
-    return this.userService.changeUserPassword(userId, changeUserPassword);
+  @Public()
+  @Post('/verifyResetCode')
+  @HttpCode(204)
+  verifyResetPasswordCode(@Body() verifyResetCodeDto: VerifyResetCodeDto) {
+    return this.userService.verifyResetPasswordCode(verifyResetCodeDto);
   }
 }
