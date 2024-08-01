@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, Logger, SetMetadata } from '@nestjs/common';
+import { Injectable, SetMetadata } from '@nestjs/common';
 import config from './getter.config';
 
 export const IS_PUBLIC_KEY = 'isPublic';

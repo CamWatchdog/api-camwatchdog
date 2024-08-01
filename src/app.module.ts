@@ -12,6 +12,7 @@ import { ComputerModule } from './computer/computer.module';
 import { jwtConfig } from './auth/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     OccurrenceModule,
     ComputerModule,
     JwtModule.registerAsync(jwtConfig),
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [

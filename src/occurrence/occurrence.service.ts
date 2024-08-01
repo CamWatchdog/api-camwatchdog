@@ -5,6 +5,7 @@ import { Occurrence } from './entities/occurrence.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { createFile, getFile } from 'src/common/storage.helper';
 import { ListAllOccurence } from './dto';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class OccurrenceService {
@@ -12,7 +13,7 @@ export class OccurrenceService {
     @InjectRepository(Occurrence) private readonly occurrenceRepository: Repository<Occurrence>,
   ) {}
 
-  async create(body: CreateOccurrenceDto, files: CreateOccurrenceFiles) {
+  async create(body: CreateOccurrenceDto, files: CreateOccurrenceFiles, computerId: UUID) {
     const createdAt = new Date(new Date().toUTCString()).getTime();
     const frameFilePath = `storage/${createdAt}_frame_${body.user}.jpg`;
     const printFilePath = `storage/${createdAt}_print_${body.user}.jpg`;
@@ -21,6 +22,7 @@ export class OccurrenceService {
     createFile(printFilePath, files.print[0].buffer);
 
     this.occurrenceRepository.save({
+      computerId,
       frameFilePath,
       printFilePath,
       user: body.user,

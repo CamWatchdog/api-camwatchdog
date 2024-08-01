@@ -19,6 +19,11 @@ export class ComputerController {
     return this.computerService.findAll(query);
   }
 
+  @Get('/mapped')
+  findMapped() {
+    return this.computerService.findMapped();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: UUID) {
     return this.computerService.findOne(id);

@@ -1,3 +1,4 @@
+import { UUID } from 'crypto';
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -16,4 +17,7 @@ export class Occurrence {
 
   @Column({ type: 'varchar', nullable: false })
   frameFilePath: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  computerId: UUID;
 }

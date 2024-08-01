@@ -3,7 +3,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { IS_COMPUTER, IS_PUBLIC_KEY } from './jwt.strategy';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Computer } from '../computer/entities/computer.entity';
 import { ComputerService } from '../computer/computer.service';
 import { UUID } from 'crypto';
 
@@ -40,7 +39,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     try {
       if (isComputer) {
-        const payload: Computer = this.jwtService.verify(token);
+        const payload = this.jwtService.decode(token);
         req['user'] = payload;
         return this.isComputerActive(payload.computerId);
       }
@@ -57,6 +56,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   private async isComputerActive(computerId: UUID) {
-    return !!(await this.computerService.findDeleted(computerId)).isActive;
+    const computerActive = (await this.computerService.findByComputerId(computerId)).isActive;
+    return !!computerActive;
   }
 }

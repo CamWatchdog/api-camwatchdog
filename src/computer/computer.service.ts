@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Like, Repository } from 'typeorm';
 import { ListComputerDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
-import { UUID } from 'crypto';
+import { UUID, randomUUID } from 'crypto';
 
 @Injectable()
 export class ComputerService {
@@ -16,12 +16,14 @@ export class ComputerService {
   ) {}
 
   create(createComputerDto: CreateComputerDto) {
+    const computerId = randomUUID();
     const token = this.jwtService.sign(
-      { description: createComputerDto.description },
+      { description: createComputerDto.description, computerId },
       { expiresIn: '0' },
     );
     const computer = {
       ...createComputerDto,
+      computerId,
       token,
     };
 
@@ -73,14 +75,24 @@ export class ComputerService {
     return this.computerRepository.findOne({ where: { computerId: id, isActive: 1 } });
   }
 
-  findDeleted(id: UUID) {
-    return this.computerRepository.findOne({ where: { computerId: id, isActive: 0 } });
+  findByComputerId(id: UUID) {
+    return this.computerRepository.findOne({ where: { computerId: id } });
+  }
+
+  async findMapped() {
+    const result = await this.computerRepository.find({ where: { isActive: 1 } });
+    return result.map((computer) => {
+      return {
+        description: computer.description,
+        computerId: computer.computerId,
+      };
+    });
   }
 
   async update(id: UUID, updateComputerDto: UpdateComputerDto) {
     const computer = {
       ...updateComputerDto,
-      token: this.jwtService.sign({ description: updateComputerDto.description }),
+      token: this.jwtService.sign({ description: updateComputerDto.description, computerId: id }),
     };
     await this.computerRepository.update({ computerId: id }, computer);
     return (await this.findOne(id)).token;
