@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -127,7 +127,7 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('User not found!');
     }
-    
+
     if (user.token.toString() !== verifyResetPasswordCode.resetCode) {
       throw new BadRequestException('Reset code incorrect!');
     }

@@ -38,7 +38,7 @@ export class UsersController {
   remove(@Param('userId') userId: UUID) {
     return this.userService.remove(userId);
   }
-  
+
   @Public()
   @Post('/sendResetCode')
   @HttpCode(204)
