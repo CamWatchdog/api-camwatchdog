@@ -79,11 +79,11 @@ export class UsersService {
       }
       delete updateUserDto.currentPassword;
     }
-    return await this.userRepository.update({ userId }, updateUserDto);
+    return (await this.userRepository.update({ userId }, updateUserDto)).affected > 0;
   }
 
   async remove(userId: UUID) {
-    return await this.userRepository.update({ userId: userId }, { isActive: 2 });
+    return (await this.userRepository.update({ userId: userId }, { isActive: 2 })).affected > 0;
   }
 
   private async genCryptedPassword(password: string) {
